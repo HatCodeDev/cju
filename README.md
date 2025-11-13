@@ -1,61 +1,93 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Casa del jubilado universitario
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Tecnologías Utilizadas
 
-## About Laravel
+Este proyecto fue construido utilizando las siguientes tecnologías:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+* **Laravel**: Un framework de aplicación web PHP con sintaxis expresiva y elegante.
+* **Filament**: Un conjunto de herramientas de desarrollo rápido para Laravel, ideal para construir interfaces de administración elegantes.
+* **PHP**: El lenguaje de programación principal utilizado para el backend del proyecto.
+* **MySQL**: El sistema de gestión de bases de datos relacionales utilizado para almacenar la información.
+* **HTML**: El lenguaje de marcado estándar para la creación de páginas web.
+* **CSS**: El lenguaje de hojas de estilo utilizado para el diseño y la presentación.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1.  **Clonar el repositorio:**
+    Ejecuta el siguiente comando en tu terminal para clonar el proyecto:
 
-## Learning Laravel
+    ```bash
+    https://github.com/HatCodeDev/cju.git
+    ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2.  **Acceder al directorio del proyecto:**
+    Navega al directorio del proyecto recién clonado:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+    ```bash
+    cd cju
+    
+3. **Instalar dependencias de Composer:**
+    Una vez en el directorio del proyecto, instala las dependencias de PHP con Composer:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+    ```bash
+    composer install
+    ```
 
-## Laravel Sponsors
+4. **Instalar dependencias de NPM:**
+    Para las dependencias de frontend, usa npm:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+    ```bash
+    npm install
+    ```
 
-### Premium Partners
+5. **Copiar el archivo de entorno y configurarlo:**
+    Copia el archivo de entorno de ejemplo:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+    ```bash
+    cp .env.example .env
+    ```
+    Luego, abre el archivo `.env` en tu editor de código y configura los detalles de tu base de datos (asegúrate de que los valores de `DB_USERNAME` y `DB_PASSWORD` coincidan con tu configuración local):
 
-## Contributing
+6. **Generar la clave de aplicación:**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+    ```bash
+    php artisan key:generate
+    ```
 
-## Code of Conduct
+7. **Ejecutar migraciones:**
+    Crea las tablas de la base de datos:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+    ```bash
+    php artisan migrate
+    ```
+8. **Crear un usuario de Filament:**
+    Para crear un usuario administrador para el panel de Filament, ejecuta:
 
-## Security Vulnerabilities
+    ```bash
+    php artisan make:filament-user
+    ```
+    Sigue las indicaciones en la terminal para ingresar los detalles del usuario:
+    * `Name:` admin
+    * `Email address:` admin@gmail.com
+    * `Password:` admin
+9. **Generar permisos y políticas de Shield:**
+    Para generar los permisos y políticas para el panel de administración de Filament, ejecuta:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+    ```bash
+    php artisan shield:generate --all
+    ```
+    Cuando te pregunte `Which panel do you want to generate permissions/policies for?`, selecciona `admin`.
 
-## License
+10. **Asignar el rol de super-administrador:**
+    Asigna el rol de super-administrador al usuario que acabas de crear:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+    ```bash
+    php artisan shield:super-admin
+    ```
+
+11. **Iniciar el servidor de desarrollo:**
+    Finalmente, inicia el servidor de desarrollo de Laravel:
+
+    ```bash
+    php artisan serve
+    ```
+    Ahora deberías poder acceder al proyecto en tu navegador en `http://127.0.0.1:8000` (o la dirección que te indique la terminal).
