@@ -11,27 +11,37 @@
         body {
             font-family: sans-serif;
             font-size: 12px;
+            margin: 0;
+            padding: 0;
         }
 
-        .container {
+        /* ESTRATEGIA: Tabla Maestra
+           Usamos border-spacing para crear el hueco entre tarjetas (gap)
+           sin afectar el ancho porcentual de las celdas.
+        */
+        table.layout-grid {
             width: 100%;
+            border-collapse: separate;
+            border-spacing: 15px; /* Espacio horizontal y vertical entre tarjetas */
+            table-layout: fixed; /* Crítico para respetar anchos exactos */
+            margin-top: -15px; /* Compensar el primer espaciado superior */
         }
 
-        /* CORRECCIÓN 1: Matemáticas Seguras */
-        .card-wrapper {
-            float: left;
-            width: 44%; /* 44% + 4% margen (2+2) = 48%. Sobra 2% de seguridad para bordes */
-            margin: 2%;
-            height: 240px;
+        td.card-cell {
+            width: 50%;
+            vertical-align: top;
+            padding: 0;
         }
 
+        /* Contenedor visual de la tarjeta */
         .card {
             border: 2px dashed #ccc;
             padding: 10px;
             text-align: center;
-            height: 215px;
+            height: 220px; /* Altura fija para consistencia */
             border-radius: 8px;
             background-color: #fff;
+            /* overflow: hidden;  Evitamos overflow hidden en dompdf si es posible, mejor controlar contenido */
         }
 
         .name {
@@ -39,11 +49,9 @@
             font-weight: bold;
             text-transform: uppercase;
             margin-bottom: 5px;
-            height: 35px;
-            line-height: 1.2;
-            overflow: hidden;
+            height: 35px; /* Altura fija para nombre */
+            line-height: 1.1;
             display: block;
-            padding-top: 5px;
         }
 
         .uuid {
@@ -51,86 +59,99 @@
             color: #666;
             margin-bottom: 5px;
             font-family: monospace;
-            word-wrap: break-word;
         }
 
-        .qr-container {
+        .qr-wrapper {
             margin: 5px auto;
             width: 120px;
             height: 120px;
-            text-align: center;
         }
 
-        .qr-container img {
+        /* Asegura que la imagen no genere espacio extra inline */
+        .qr-wrapper img {
+            display: block;
             width: 120px;
             height: 120px;
         }
 
         .footer {
-            margin-top: 10px;
+            margin-top: 8px;
             font-size: 8px;
             color: #888;
             border-top: 1px solid #eee;
             padding-top: 5px;
         }
 
-        /* Salto de Página */
         .page-break {
             page-break-after: always;
-            clear: both;
         }
 
-        /* CORRECCIÓN 2: Salto de Fila Estricto */
-        .row-break {
-            clear: both; /* Esto resetea los floats */
-            display: block;
-            width: 100%;
-            height: 0;
-            margin: 0;
-            padding: 0;
+        /* Utilidad para celdas vacías si el total es impar */
+        .empty-cell {
             border: none;
+            background: transparent;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    @foreach($retirees as $retiree)
-        <div class="card-wrapper">
-            <div class="card">
-                <div class="name">
-                    {{ Str::limit($retiree->full_name, 40) }}
-                </div>
 
-                <div class="uuid">{{ $retiree->uuid }}</div>
+{{-- Procesamos en grupos de 2 (Filas) --}}
+@foreach($retirees->chunk(2) as $row)
 
-                <div class="qr-container">
-                    <img
-                        src="data:image/svg+xml;base64,{{ base64_encode(QrCode::format('svg')->size(120)->errorCorrection('H')->generate($retiree->uuid)) }}"
-                        width="120"
-                        height="120"
-                    >
-                </div>
+    <table class="layout-grid">
+        <tr>
+            @foreach($row as $retiree)
+                <td class="card-cell">
+                    <div class="card">
+                        <div class="name">
+                            {{ Str::limit($retiree->full_name, 45) }}
+                        </div>
 
-                <div class="footer">
-                    ESTACIÓN DE ESCANEO - CONTROL
-                </div>
-            </div>
-        </div>
+                        <div class="uuid">{{ $retiree->uuid }}</div>
 
-        {{-- LÓGICA DE CONTROL DE FLUJO --}}
+                        <div class="qr-wrapper">
+                            {{--
+                               OPTIMIZACIÓN:
+                               Generamos el QR directamente.
+                               Nota: Asegúrate de que $retiree->uuid no sea null.
+                            --}}
+                            <img
+                                src="data:image/svg+xml;base64,{{ base64_encode(
+                                        QrCode::format('svg')
+                                            ->size(120)
+                                            ->margin(0) // Margen 0 en el QR para aprovechar espacio
+                                            ->errorCorrection('M') // 'M' es suficiente y genera QRs menos densos (más fáciles de leer)
+                                            ->generate((string) $retiree->uuid)
+                                    ) }}"
+                                width="120"
+                                height="120"
+                            >
+                        </div>
 
-        {{-- 1. Salto de Fila: Cada 2 tarjetas, forzamos nueva línea --}}
-        @if($loop->iteration % 2 == 0)
-            <div class="row-break"></div>
-        @endif
+                        <div class="footer">
+                            ESTACIÓN DE ESCANEO - CONTROL
+                        </div>
+                    </div>
+                </td>
+            @endforeach
 
-        {{-- 2. Salto de Página: Cada 8 tarjetas, forzamos nueva hoja --}}
-        {{-- Nota: Usamos modulus 8 para que ocurra en la tarjeta 8, 16, 24... --}}
-        @if($loop->iteration % 8 == 0 && !$loop->last)
-            <div class="page-break"></div>
-        @endif
+            {{-- Si la fila tiene solo 1 elemento (impar), rellenamos para mantener estructura --}}
+            @if($row->count() < 2)
+                <td class="card-cell empty-cell"></td>
+            @endif
+        </tr>
+    </table>
 
-    @endforeach
-</div>
+    {{--
+       LÓGICA DE PAGINACIÓN:
+       Si hemos impreso 4 filas (8 tarjetas), forzamos salto de página.
+       Usamos $loop->iteration sobre el loop de CHUNKS (filas), no de items individuales.
+    --}}
+    @if($loop->iteration % 4 == 0 && !$loop->last)
+        <div class="page-break"></div>
+    @endif
+
+@endforeach
+
 </body>
 </html>

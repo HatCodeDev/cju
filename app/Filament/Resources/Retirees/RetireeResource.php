@@ -201,9 +201,21 @@ class RetireeResource extends Resource
                         ->icon('heroicon-o-printer')
                         ->color('warning')
                         ->action(function (Collection $records) {
-                            $pdf = Pdf::loadView('pdf.retiree-card', ['retirees' => $records]);
-                            $filename = 'Credenciales-Masivas-' . date('Y-m-d-His') . '.pdf';
-                            return response()->streamDownload(function () use ($pdf) { echo $pdf->output(); }, $filename);
+                            $pdf = Pdf::loadView('pdf.retiree-card', [
+                                'retirees' => $records
+                            ]);
+                            $pdf->setPaper('letter', 'portrait');
+
+                            $pdf->setOptions([
+                                'dpi' => 150,
+                                'defaultFont' => 'sans-serif',
+                                'isRemoteEnabled' => true
+                            ]);
+                            $filename = 'Credenciales-Masivas-' . now()->format('Y-m-d-His') . '.pdf';
+                            return response()->streamDownload(
+                                fn () => print($pdf->output()),
+                                $filename
+                            );
                         })
                         ->deselectRecordsAfterCompletion(),
                 ]),
