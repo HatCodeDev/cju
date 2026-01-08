@@ -13,7 +13,7 @@ return new class extends Migration
             $table->uuid('uuid')->unique()->index();
 
             $table->string('full_name');
-
+            $table->string('curp', 18)->unique();
             $table->string('patient_type')->nullable();
             $table->string('gender')->nullable();
             $table->date('birth_date')->nullable();

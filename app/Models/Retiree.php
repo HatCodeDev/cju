@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\Gender;
@@ -18,11 +20,10 @@ class Retiree extends Model
     protected $fillable = [
         'uuid',
         'full_name',
-        // --- CORRECCIÓN: Agregamos los campos permitidos ---
+        'curp',
         'patient_type',
         'gender',
         'birth_date',
-        // --------------------------------------------------
         'emergency_contact1',
         'emergency_contact2',
         'medical_notes',
@@ -32,7 +33,6 @@ class Retiree extends Model
 
     protected $casts = [
         'is_present' => 'boolean',
-        // --- CORRECCIÓN: Restauramos el tipado para Enums ---
         'patient_type' => PatientType::class,
         'gender' => Gender::class,
         'birth_date' => 'date',
@@ -48,7 +48,6 @@ class Retiree extends Model
         return $this->hasMany(AttendanceLog::class)->latest();
     }
 
-    // --- CORRECCIÓN: Restauramos el cálculo de edad ---
     public function getAgeAttribute(): ?int
     {
         return $this->birth_date ? Carbon::parse($this->birth_date)->age : null;

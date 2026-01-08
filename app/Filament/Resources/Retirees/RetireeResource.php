@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Retirees;
 
 use App\Filament\Resources\Retirees\Pages;
@@ -51,13 +53,23 @@ class RetireeResource extends Resource
                             ->directory('retirees-photos')
                             ->columnSpanFull(),
 
-
                         Grid::make(2)
                             ->schema([
                                 Forms\Components\TextInput::make('full_name')
                                     ->label('Nombre Completo')
                                     ->required()
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->dehydrateStateUsing(fn (?string $state): string => Str::title($state ?? '')),
+
+                                Forms\Components\TextInput::make('curp')
+                                    ->label('CURP')
+                                    ->required()
+                                    ->minLength(18)
+                                    ->maxLength(18)
+                                    ->unique(ignoreRecord: true)
+                                    ->extraInputAttributes(['style' => 'text-transform: uppercase'])
+                                    ->dehydrateStateUsing(fn (string $state): string => strtoupper($state))
+                                    ->placeholder('CLAVE ÚNICA DE REGISTRO DE POBLACIÓN'),
 
                                 Forms\Components\Select::make('patient_type')
                                     ->label('Tipo de Paciente')
@@ -65,7 +77,6 @@ class RetireeResource extends Resource
                                     ->native(false)
                                     ->required(),
                             ]),
-
 
                         Grid::make(2)
                             ->schema([
@@ -77,7 +88,6 @@ class RetireeResource extends Resource
                                 Forms\Components\DatePicker::make('birth_date')
                                     ->label('Fecha de Nacimiento')
                                     ->maxDate(now())
-                                    // Quitamos ->live() y ->afterStateUpdated() para evitar el error
                                     ->required(),
                             ]),
 
@@ -93,10 +103,20 @@ class RetireeResource extends Resource
                         Forms\Components\TextInput::make('emergency_contact1')
                             ->label('Contacto de Emergencia 1')
                             ->tel()
-                            ->required(),
+                            ->numeric()
+                            ->minLength(10)
+                            ->maxLength(10)
+                            ->required()
+                            ->placeholder('10 dígitos sin espacios'),
+
                         Forms\Components\TextInput::make('emergency_contact2')
                             ->label('Contacto de Emergencia 2')
-                            ->tel(),
+                            ->tel()
+                            ->numeric()
+                            ->minLength(10)
+                            ->maxLength(10)
+                            ->placeholder('Opcional'),
+
                         Forms\Components\Textarea::make('medical_notes')
                             ->label('Notas Médicas')
                             ->rows(3)
@@ -119,25 +139,23 @@ class RetireeResource extends Resource
                     ->sortable()
                     ->description(fn (Retiree $record) => $record->gender?->getLabel()),
 
+                Tables\Columns\TextColumn::make('curp')
+                    ->label('CURP')
+                    ->searchable()
+                    ->copyable()
+                    ->toggleable(),
+
                 Tables\Columns\TextColumn::make('patient_type')
                     ->label('Tipo')
                     ->badge()
                     ->sortable(),
 
-                // AQUÍ ESTÁ LA MAGIA PARA LA TABLA:
-                // Usamos una columna calculada que NO existe en la base de datos.
-                // Usamos ->state() para calcular el valor usando el Accessor del modelo.
                 Tables\Columns\TextColumn::make('age_calc')
                     ->label('Edad')
                     ->state(fn (Retiree $record) => $record->age ? $record->age . ' años' : 'Sin fecha')
                     ->sortable(query: function (Builder $query, string $direction): Builder {
                         return $query->orderBy('birth_date', $direction);
                     }),
-
-                Tables\Columns\TextColumn::make('uuid')
-                    ->label('ID Interno')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->limit(8),
 
                 Tables\Columns\IconColumn::make('is_present')
                     ->label('Asistencia')
@@ -146,7 +164,9 @@ class RetireeResource extends Resource
 
                 Tables\Columns\TextColumn::make('emergency_contact1')
                     ->label('Tel. Emergencia')
-                    ->icon('heroicon-m-phone'),
+                    ->icon('heroicon-m-phone')
+                    ->copyable()
+                    ->formatStateUsing(fn (string $state): string => preg_replace("/^(\d{3})(\d{3})(\d{4})$/", "($1) $2-$3", $state)), // Formato visual (XXX) XXX-XXXX
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
