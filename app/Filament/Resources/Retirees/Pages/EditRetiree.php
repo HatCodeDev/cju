@@ -20,4 +20,9 @@ class EditRetiree extends EditRecord
             RestoreAction::make(),
         ];
     }
+    protected function getRedirectUrl(): string
+    {
+        // Retorna la URL del índice (la tabla)
+        return $this->getResource()::getUrl('index');
+    }
 }
