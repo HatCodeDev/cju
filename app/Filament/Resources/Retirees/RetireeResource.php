@@ -143,7 +143,11 @@ class RetireeResource extends Resource
                     ->label('CURP')
                     ->searchable()
                     ->copyable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('uuid')
+                    ->label('UUID')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('patient_type')
                     ->label('Tipo')
