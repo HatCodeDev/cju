@@ -96,7 +96,7 @@
 <body>
 
 {{-- Procesamos en grupos de 2 (Filas) --}}
-@foreach($retirees->chunk(2) as $row)
+@foreach(collect($retirees)->chunk(2) as $row)
 
     <table class="layout-grid">
         <tr>
