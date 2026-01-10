@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\Schemas;
-
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
@@ -22,6 +22,16 @@ class UserForm
                     ->icon('heroicon-o-user')
                     ->columns(2) // Grid de 2 columnas dentro de la sección
                     ->schema([
+                        FileUpload::make('avatar_url')
+                            ->label('Fotografía de Perfil')
+                            ->directory('user-avatars')
+                            ->disk('public')
+                            ->visibility('public')
+                            ->avatar() // Formato circular en preview
+                            ->image()
+                            ->imageEditor()
+                            ->columnSpanFull() // Centrado arriba o mover a una columna lateral
+                            ->maxSize(2048),
                         TextInput::make('name')
                             ->label('Nombre Completo')
                             ->required()
