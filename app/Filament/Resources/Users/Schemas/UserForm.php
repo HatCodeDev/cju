@@ -10,7 +10,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Operation;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Str;
 class UserForm
 {
     public static function configure(Schema $schema): Schema
@@ -34,6 +34,7 @@ class UserForm
                             ->maxSize(2048),
                         TextInput::make('name')
                             ->label('Nombre Completo')
+                            ->dehydrateStateUsing(fn (?string $state): string => Str::title($state ?? ''))
                             ->required()
                             ->maxLength(255),
 
