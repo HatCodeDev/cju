@@ -159,7 +159,7 @@
 
                 <div class="photo-area">
                     @if($user->avatar_url)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::url($user->avatar_url) }}" class="photo-img" alt="Foto">
+                        <img src="{{ $user->avatar_url }}" class="photo-img" alt="Foto">
                     @else
                         <div style="width:100%; height:100%; background:#ccc; display:flex; align-items:center; justify-content:center; color:white; font-size:20pt;">?</div>
                     @endif

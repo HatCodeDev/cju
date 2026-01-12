@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\HasAvatar;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class User extends Authenticatable
 {
@@ -34,8 +35,34 @@ class User extends Authenticatable
         ];
     }
 
+    protected function avatarUrl(): Attribute
+    {
+        return Attribute::make(
+            get: function (?string $value) {
+                if (! $value) {
+                    return null;
+                }
+
+                // Si ya es una URL completa (ej. http...), la devolvemos tal cual
+                if (filter_var($value, FILTER_VALIDATE_URL)) {
+                    return $value;
+                }
+
+                // Si no, construimos la URL pública
+                // Usamos 'public' disk explícitamente como vimos en Tinker
+                return Storage::disk('public')->url($value);
+            }
+        );
+    }
+
+    // -------------------------------------------------------------------------
+    // Implementación de Filament
+    // -------------------------------------------------------------------------
+
     public function getFilamentAvatarUrl(): ?string
     {
-        return $this->avatar_url ? Storage::url($this->avatar_url) : null;
+        // Al llamar a $this->avatar_url aquí, el Accessor de arriba se ejecuta automáticamente.
+        return $this->avatar_url;
     }
+
 }
