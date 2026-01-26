@@ -22,7 +22,6 @@ class ScanStation extends Page
 
     protected static ?string $title = 'Estación de Escaneo';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Operaciones';
 
     protected string $view = 'filament.pages.scan-station';
 

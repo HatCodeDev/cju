@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
@@ -35,6 +36,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function workshops(): HasMany
+    {
+        return $this->hasMany(Workshop::class, 'teacher_id');
+    }
+
     protected function avatarUrl(): Attribute
     {
         return Attribute::make(
@@ -42,26 +48,16 @@ class User extends Authenticatable
                 if (! $value) {
                     return null;
                 }
-
-                // Si ya es una URL completa (ej. http...), la devolvemos tal cual
                 if (filter_var($value, FILTER_VALIDATE_URL)) {
                     return $value;
                 }
-
-                // Si no, construimos la URL pública
-                // Usamos 'public' disk explícitamente como vimos en Tinker
                 return Storage::disk('public')->url($value);
             }
         );
     }
 
-    // -------------------------------------------------------------------------
-    // Implementación de Filament
-    // -------------------------------------------------------------------------
-
     public function getFilamentAvatarUrl(): ?string
     {
-        // Al llamar a $this->avatar_url aquí, el Accessor de arriba se ejecuta automáticamente.
         return $this->avatar_url;
     }
 
