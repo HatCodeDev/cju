@@ -154,6 +154,8 @@ class WorkshopCalendarWidget extends CalendarWidget
 
     public static function canView(): bool
     {
-        return true;
+        // Mantenemos esto para que no salga en el dashboard
+        $currentRoute = request()->route()?->getName();
+        return $currentRoute && str_contains($currentRoute, 'workshop-calendar-page');
     }
 }

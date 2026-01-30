@@ -15,6 +15,7 @@ class LocationForm
         return $schema
             ->components([
                 Section::make('Detalles de la Ubicación')
+                    ->columnSpanFull()
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Nombre del Salón/Lugar')

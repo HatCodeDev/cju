@@ -10,23 +10,35 @@ return new class extends Migration
     {
         Schema::create('retirees', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid')->unique()->index();
+            $table->uuid('uuid')->unique(); // CRÍTICO: Para tu escáner QR
 
+            // Datos Generales
             $table->string('full_name');
             $table->string('curp', 18)->unique();
-            $table->string('patient_type')->nullable();
-            $table->string('gender')->nullable();
-            $table->date('birth_date')->nullable();
+            $table->string('phone', 20);
+            $table->date('birth_date');
+            $table->string('gender'); // Mantenemos género para tu lógica actual
 
-            $table->string('emergency_contact1');
-            $table->string('emergency_contact2')->nullable();
-            $table->text('medical_notes')->nullable();
-            $table->string('photo_path')->nullable();
+            // Foto
+            $table->string('photo_path')->nullable(); // CRÍTICO: Para la credencial
 
-            $table->boolean('is_present')->default(false)->index();
+            // Estado de Asistencia
+            $table->boolean('is_present')->default(false); // CRÍTICO: Para ScanStation
 
-            $table->softDeletes();
+            // Lógica de Negocio (Nuevos campos normalizados)
+            $table->string('retiree_type'); // Antes patient_type
+            $table->string('worker_id')->nullable();
+
+            // Datos Salud
+            $table->text('allergies')->nullable();
+            $table->string('insurance_type');
+            $table->string('insurance_name')->nullable();
+
+            // Notas
+            $table->text('other_services_notes')->nullable();
+
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -34,25 +34,31 @@ class WorkshopsTable
                 TextColumn::make('schedules_summary')
                     ->label('Horarios')
                     ->state(function (Workshop $record): string {
+                        if (!$record->relationLoaded('schedules')) {
+                            $record->load('schedules');
+                        }
                         if ($record->schedules->isEmpty()) {
-                            return 'Sin asignar';
+                            return 'Sin horarios';
                         }
 
                         // Formatear: "Lun 10:00-11:00, Mar..."
                         return $record->schedules
                             ->map(function ($schedule) {
-                                // Convertimos el enum o entero a nombre corto (ej: 'Lun')
-                                $dayName = match($schedule->day_of_week) {
-                                    DayOfWeek::Lunes, 1 => 'Lun',
-                                    DayOfWeek::Martes, 2 => 'Mar',
-                                    DayOfWeek::Miercoles, 3 => 'Mié',
-                                    DayOfWeek::Jueves, 4 => 'Jue',
-                                    DayOfWeek::Viernes, 5 => 'Vie',
-                                    DayOfWeek::Sabado, 6 => 'Sáb',
-                                    DayOfWeek::Domingo, 7 => 'Dom',
+                                // Manejo robusto del Enum o entero
+                                $dayVal = $schedule->day_of_week;
+                                // Si es un objeto Enum, obtener su valor, si no, usarlo directo
+                                $val = $dayVal instanceof \UnitEnum ? $dayVal->value : $dayVal;
+
+                                $dayName = match($val) {
+                                    1, '1' => 'Lun',
+                                    2, '2' => 'Mar',
+                                    3, '3' => 'Mié',
+                                    4, '4' => 'Jue',
+                                    5, '5' => 'Vie',
+                                    6, '6' => 'Sáb',
+                                    7, '7' => 'Dom',
                                     default => '?',
                                 };
-
                                 // Formateo simple de horas
                                 $start = \Carbon\Carbon::parse($schedule->start_time)->format('H:i');
                                 $end = \Carbon\Carbon::parse($schedule->end_time)->format('H:i');
@@ -61,6 +67,7 @@ class WorkshopsTable
                             })
                             ->join(', ');
                     })
+                    ->size('sm')
                     ->wrap(), // Permitir que salte de línea si es largo
 
                 IconColumn::make('is_active')

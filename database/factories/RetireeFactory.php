@@ -1,44 +1,53 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
+use App\Enums\Gender; // Asegúrate de importar tu Enum original
+use App\Enums\InsuranceType;
+use App\Enums\RetireeType;
 use App\Models\Retiree;
-use App\Enums\Gender;
-use App\Enums\PatientType;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 class RetireeFactory extends Factory
 {
-    /**
-     * El modelo asociado a este factory.
-     */
     protected $model = Retiree::class;
 
     public function definition(): array
     {
-        // Generador de CURP simulado (Regex para cumplir formato: 4 letras, 6 nums, H/M, etc)
-        // Patrón: AAAA 000000 H/M AA AAA 00
-        $curpPattern = '[A-Z]{4}[0-9]{6}[HM][A-Z]{2}[B-DF-HJ-NP-TV-Z]{3}[0-9]{2}';
+        // Pre-calculamos valores para lógica condicional
+        $retireeType = $this->faker->randomElement(RetireeType::cases());
+        $insuranceType = $this->faker->randomElement(InsuranceType::cases());
 
         return [
-            // UUID se genera automáticamente por el Trait HasUuids del modelo,
+            // --- CAMPOS LEGACY (Necesarios para tu sistema actual) ---
+            // UUID se genera automático por el Trait HasUuids del modelo
+            'gender' => $this->faker->randomElement(Gender::cases()), // ¡CRÍTICO! Esto faltaba
+            'is_present' => $this->faker->boolean(20), // Simulamos que algunos están presentes
+            'photo_path' => null, // O puedes poner una url falsa si quieres
 
-            'full_name' => $this->faker->name(), // Genera nombres como "Juan Perez"
+            // --- DATOS GENERALES ---
+            'full_name' => $this->faker->name(),
+            'curp' => $this->faker->unique()->regexify('[A-Z]{4}[0-9]{6}[HM][A-Z]{2}[A-Z]{3}[0-9]{2}'),
+            'phone' => $this->faker->numerify('##########'),
+            'birth_date' => $this->faker->dateTimeBetween('-90 years', '-60 years'),
 
-            'curp' => $this->faker->unique()->regexify($curpPattern),
+            // --- NUEVA LÓGICA DE NEGOCIO ---
+            'retiree_type' => $retireeType,
+            // Solo generamos ID si es interno
+            'worker_id' => $retireeType === RetireeType::Internal
+                ? (string) $this->faker->unique()->numberBetween(10000000, 99999999)
+                : null,
 
-            'patient_type' => $this->faker->randomElement(PatientType::cases()),
-            'gender' => $this->faker->randomElement(Gender::cases()),
+            // --- DATOS MÉDICOS ---
+            'allergies' => $this->faker->boolean(20) ? 'Penicilina, Polvo' : null,
+            'insurance_type' => $insuranceType,
+            'insurance_name' => $insuranceType === InsuranceType::Other
+                ? $this->faker->company()
+                : null,
 
-            'birth_date' => $this->faker->date('Y-m-d', '-60 years'), // Gente mayor de 60 años
-
-            'emergency_contact1' => $this->faker->numerify('##########'),
-            'emergency_contact2' => $this->faker->boolean(50) ? $this->faker->numerify('##########') : null,
-
-            'medical_notes' => $this->faker->text(100),
-            'photo_path' => null,
-            'is_present' => false
+            'other_services_notes' => $this->faker->boolean(30) ? $this->faker->text(50) : null,
         ];
     }
 }
