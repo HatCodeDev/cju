@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             LocationSeeder::class,
             RetireeSeeder::class,
+            RealWorkshopSeeder::class
         ]);
     }
 }

@@ -20,7 +20,7 @@ class WorkshopCalendarPage extends Page implements HasSchemas
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-calendar-days';
     protected static string | UnitEnum | null $navigationGroup = 'Gestion de Talleres';
-    protected static ?string $navigationLabel = 'Calendario de Ocupación';
+    protected static ?string $navigationLabel = 'Calendario (En desarrollo)';
     protected static ?string $title = 'Calendario de Talleres';
     protected static ?int $navigationSort = 10;
 

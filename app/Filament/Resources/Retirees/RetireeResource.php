@@ -5,21 +5,23 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Retirees;
 
 use App\Filament\Resources\Retirees\Pages;
-use App\Filament\Resources\Retirees\Schemas\RetireeForm; // Importamos la clase del formulario
-use App\Filament\Resources\Retirees\Tables\RetireesTable; // Importamos la clase de la tabla
+use App\Filament\Resources\Retirees\Schemas\RetireeForm;
+use App\Filament\Resources\Retirees\Tables\RetireesTable;
 use App\Models\Retiree;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use BackedEnum; // Necesario para tipado estricto en Filament 4
+use BackedEnum;
+use UnitEnum;
 
 class RetireeResource extends Resource
 {
     protected static ?string $model = Retiree::class;
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-user-group';
+    protected static string | UnitEnum | null $navigationGroup = 'Gestion de jubilados';
 
     protected static ?string $modelLabel = 'Jubilado';
 
@@ -29,19 +31,16 @@ class RetireeResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        // Delegamos la configuración a la clase dedicada
         return RetireeForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        // Delegamos la configuración a la clase dedicada
         return RetireesTable::configure($table);
     }
 
     public static function getRelations(): array
     {
-        // Por ahora vacío, ya que manejaremos contactos y servicios dentro del mismo formulario
         return [];
     }
 

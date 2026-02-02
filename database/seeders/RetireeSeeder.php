@@ -24,7 +24,7 @@ class RetireeSeeder extends Seeder
 
         // 2. Creamos 20 jubilados
         Retiree::factory()
-            ->count(20)
+            ->count(5)
             ->create()
             ->each(function (Retiree $retiree) use ($medicalServices) {
 

@@ -76,8 +76,15 @@ class RetireesTable
                     ->label('Emergencia')
                     ->icon('heroicon-m-phone')
                     ->copyable()
+                    ->copyableState(fn ($state) => preg_replace('/\D/', '', $state ?? ''))
                     ->placeholder('-')
-                    ->formatStateUsing(fn (?string $state): string => $state ? preg_replace("/^(\d{3})(\d{3})(\d{4})$/", "($1) $2-$3", $state) : ''),
+                    ->formatStateUsing(function ($state) {
+                        if (! $state) return null;
+                        $cleaned = preg_replace('/\D/', '', $state);
+                        return preg_replace("/^(\d{3})(\d{3})(\d{4})$/", "($1) $2 $3", $cleaned);
+                    })
+                    ->url(fn ($state) => $state ? "tel:{$state}" : null)
+                    ->openUrlInNewTab(false),
             ])
             ->filters([
                 TrashedFilter::make(),

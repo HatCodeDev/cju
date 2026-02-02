@@ -76,6 +76,8 @@ class RetireeForm
                                         TextInput::make('phone')
                                             ->label('Teléfono Personal')
                                             ->tel()
+                                            ->length(10)
+                                            ->numeric()
                                             ->required(),
                                     ]),
 
@@ -172,7 +174,7 @@ class RetireeForm
                                         CheckboxList::make('workshops')
                                             ->hiddenLabel()
                                             ->relationship(titleAttribute: 'name')
-                                            ->columns(1)
+                                            ->columns(2)
                                             ->searchable()
                                             ->noSearchResultsMessage('No hay talleres disponibles'),
                                     ]),

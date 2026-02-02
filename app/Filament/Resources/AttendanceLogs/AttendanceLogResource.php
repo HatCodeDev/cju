@@ -24,6 +24,7 @@ class AttendanceLogResource extends Resource
     protected static ?string $model = AttendanceLog::class;
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-clock';
+    protected static string | UnitEnum | null $navigationGroup = 'Gestion de jubilados';
 
     protected static ?string $modelLabel = 'Registro de Asistencia';
     protected static ?string $pluralModelLabel = 'Bitácora de Accesos';

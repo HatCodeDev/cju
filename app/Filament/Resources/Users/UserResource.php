@@ -11,9 +11,10 @@ use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Tables\UsersTable;
 use App\Models\User;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon; // Asegúrate de importar el Enum correcto de v4
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class UserResource extends Resource
@@ -21,9 +22,11 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::UserGroup;
+    protected static string | UnitEnum | null $navigationGroup = 'Administración (En desarrollo)';
 
-    protected static ?string $modelLabel = 'Usuario';
-    protected static ?string $pluralModelLabel = 'Usuarios';
+
+    protected static ?string $modelLabel = 'Personal';
+    protected static ?string $pluralModelLabel = 'Personal';
     //protected static ?string $navigationGroup = 'Gestión de Acceso';
     protected static ?int $navigationSort = 1;
 

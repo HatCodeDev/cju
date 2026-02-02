@@ -18,7 +18,9 @@ class ScanStation extends Page
 {
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-viewfinder-circle';
 
-    protected static ?string $navigationLabel = 'Estación de Escaneo';
+    protected static ?string $navigationLabel = 'Escaneo de asistencia';
+    protected static string | UnitEnum | null $navigationGroup = 'Gestion de jubilados';
+
 
     protected static ?string $title = 'Estación de Escaneo';
 

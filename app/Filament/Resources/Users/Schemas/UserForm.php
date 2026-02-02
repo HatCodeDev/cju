@@ -18,6 +18,7 @@ class UserForm
         return $schema
             ->components([
                 Section::make('Información del Usuario')
+                    ->columnSpanFull()
                     ->description('Administre los detalles de la cuenta y los roles de acceso.')
                     ->icon('heroicon-o-user')
                     ->columns(2) // Grid de 2 columnas dentro de la sección

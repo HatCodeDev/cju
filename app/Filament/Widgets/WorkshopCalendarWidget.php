@@ -56,24 +56,13 @@ class WorkshopCalendarWidget extends CalendarWidget
 
     public function getEvents(FetchInfo $info): Collection|array
     {
-        // DEBUG INTERNO DEL WIDGET (Quitar cuando funcione)
-        // dd("DEBUG WIDGET: Recibí ID: " . $this->currentLocationId);
-
         if (! $this->currentLocationId) {
             return [];
         }
 
-        // Consultamos horarios usando la propiedad directa
         $schedules = WorkshopSchedule::with(['workshop.teacher', 'location'])
             ->where('location_id', $this->currentLocationId)
             ->get();
-
-        // Si está vacío, hacemos un dump para confirmar que buscó en el lugar correcto
-        if ($schedules->isEmpty()) {
-            // Esto saldrá en la consola de red o pantalla negra si hay error,
-            // Confirmará que buscó en el ID correcto (ej. 7) y no encontró nada.
-            // dd("DEBUG: Busqué en Location ID {$this->currentLocationId} y no encontré horarios. (Esto es correcto si el salón está vacío)");
-        }
 
         $events = collect();
         $appTimezone = config('app.timezone', 'America/Mexico_City');
@@ -95,16 +84,20 @@ class WorkshopCalendarWidget extends CalendarWidget
 
                 $color = $this->getColorForWorkshop($schedule->workshop_id);
 
+                // CORRECCIÓN AQUÍ: Manejo seguro del profesor nulo
+                $teacherName = $schedule->workshop->teacher?->name ?? 'Sin Profesor';
+
                 $events->push(
                     CalendarEvent::make($schedule)
-                        ->title("{$schedule->workshop->name}\n({$schedule->workshop->teacher->name})")
+                        // Usamos la variable segura $teacherName
+                        ->title("{$schedule->workshop->name}\n({$teacherName})")
                         ->start($startDateTime)
                         ->end($endDateTime)
                         ->resourceId($schedule->location_id)
                         ->backgroundColor($color)
-
                         ->extendedProps([
-                            'teacher' => $schedule->workshop->teacher->name,
+                            // Usamos navegación segura ?->name
+                            'teacher' => $teacherName,
                             'description' => $schedule->workshop->description ?? '',
                         ])
                         ->action('edit')
@@ -115,8 +108,6 @@ class WorkshopCalendarWidget extends CalendarWidget
 
         return $events->toArray();
     }
-
-    // ... (El resto de tus métodos defaultSchema, getColorForWorkshop, canView siguen igual) ...
     public function defaultSchema(Schema $schema): Schema
     {
         return $schema->components([
